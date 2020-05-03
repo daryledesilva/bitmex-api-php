@@ -1,0 +1,9 @@
+{
+    "name": "daryledesilva/bitmex-api-php",
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "DaryleDeSilva\\BitMex\\": "src/"
+        }
+    }
+}

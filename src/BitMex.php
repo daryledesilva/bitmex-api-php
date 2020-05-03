@@ -1,5 +1,7 @@
 <?php
 
+namespace DaryleDeSilva\BitMex;
+
 /*
  * BitMex PHP REST API
  *
@@ -10,10 +12,37 @@
 
 class BitMex {
 
-  //const API_URL = 'https://testnet.bitmex.com';
+  const TESTNET_API_URL = 'https://testnet.bitmex.com';
   const API_URL = 'https://www.bitmex.com';
   const API_PATH = '/api/v1/';
-  const SYMBOL = 'XBTUSD';
+  /** @var string */
+  protected $symbol = 'XBTUSD';
+  /** @var bool */
+  protected $useTestnet = false;
+
+    /**
+     * @return string
+     */
+    public function getApiUrl(): string
+    {
+        return $this->useTestnet ? self::TESTNET_API_URL : self::API_URL;
+    }
+
+    /**
+     * @param string $symbol
+     */
+    public function setSymbol(string $symbol): void
+    {
+        $this->symbol = $symbol;
+    }
+
+    /**
+     * @param bool $useTestnet
+     */
+    public function setUseTestnet(bool $useTestnet): void
+    {
+        $this->useTestnet = $useTestnet;
+    }
 
   private $apiKey;
   private $apiSecret;
@@ -55,7 +84,7 @@ class BitMex {
 
   public function getTicker() {
 
-    $symbol = self::SYMBOL;
+    $symbol = $this->symbol;
     $data['function'] = "instrument";
     $data['params'] = array(
       "symbol" => $symbol
@@ -92,7 +121,7 @@ class BitMex {
 
   public function getCandles($timeFrame,$count,$offset = 0) {
 
-    $symbol = self::SYMBOL;
+    $symbol = $this->symbol;
     $data['function'] = "trade/bucketed";
     $data['params'] = array(
       "symbol" => $symbol,
@@ -139,7 +168,7 @@ class BitMex {
 
   public function getOrder($orderID,$count = 100) {
 
-    $symbol = self::SYMBOL;
+    $symbol = $this->symbol;
     $data['method'] = "GET";
     $data['function'] = "order";
     $data['params'] = array(
@@ -170,7 +199,7 @@ class BitMex {
 
   public function getOrders($count = 100) {
 
-    $symbol = self::SYMBOL;
+    $symbol = $this->symbol;
     $data['method'] = "GET";
     $data['function'] = "order";
     $data['params'] = array(
@@ -192,7 +221,7 @@ class BitMex {
 
   public function getOpenOrders() {
 
-    $symbol = self::SYMBOL;
+    $symbol = $this->symbol;
     $data['method'] = "GET";
     $data['function'] = "order";
     $data['params'] = array(
@@ -221,7 +250,7 @@ class BitMex {
 
   public function getOpenPositions() {
 
-    $symbol = self::SYMBOL;
+    $symbol = $this->symbol;
     $data['method'] = "GET";
     $data['function'] = "position";
     $data['params'] = array(
@@ -253,7 +282,7 @@ class BitMex {
 
   public function getPositions() {
 
-    $symbol = self::SYMBOL;
+    $symbol = $this->symbol;
     $data['method'] = "GET";
     $data['function'] = "position";
     $data['params'] = array(
@@ -275,7 +304,7 @@ class BitMex {
 
   public function closePosition($price) {
 
-    $symbol = self::SYMBOL;
+    $symbol = $this->symbol;
     $data['method'] = "POST";
     $data['function'] = "order/closePosition";
     $data['params'] = array(
@@ -325,7 +354,7 @@ class BitMex {
 
   public function createOrder($type,$side,$price,$quantity,$maker = false) {
 
-    $symbol = self::SYMBOL;
+    $symbol = $this->symbol;
     $data['method'] = "POST";
     $data['function'] = "order";
     $data['params'] = array(
@@ -357,7 +386,7 @@ class BitMex {
 
   public function createLimitOrder($quantity,$price,$instructions = false) {
 
-    $symbol = self::SYMBOL;
+    $symbol = $this->symbol;
     $data['method'] = "POST";
     $data['function'] = "order";
     $data['params'] = array(
@@ -387,7 +416,7 @@ class BitMex {
 
   public function createStopMarketOrder($quantity,$stopPrice,$instructions = false) {
 
-    $symbol = self::SYMBOL;
+    $symbol = $this->symbol;
     $data['method'] = "POST";
     $data['function'] = "order";
     $data['params'] = array(
@@ -418,7 +447,7 @@ class BitMex {
 
   public function createStopLimitOrder($quantity,$stopPrice,$price,$instructions = false) {
 
-    $symbol = self::SYMBOL;
+    $symbol = $this->symbol;
     $data['method'] = "POST";
     $data['function'] = "order";
     $data['params'] = array(
@@ -448,7 +477,7 @@ class BitMex {
 
   public function cancelAllOpenOrders($text = "") {
 
-    $symbol = self::SYMBOL;
+    $symbol = $this->symbol;
     $data['method'] = "DELETE";
     $data['function'] = "order/all";
     $data['params'] = array(
@@ -507,7 +536,7 @@ class BitMex {
 
   public function getOrderBook($depth = 25) {
 
-    $symbol = self::SYMBOL;
+    $symbol = $this->symbol;
     $data['method'] = "GET";
     $data['function'] = "orderBook/L2";
     $data['params'] = array(
@@ -529,7 +558,7 @@ class BitMex {
 
   public function setLeverage($leverage) {
 
-    $symbol = self::SYMBOL;
+    $symbol = $this->symbol;
     $data['method'] = "POST";
     $data['function'] = "position/leverage";
     $data['params'] = array(
@@ -566,7 +595,7 @@ class BitMex {
       $params = json_encode($data['params']);
     }
     $path = self::API_PATH . $function;
-    $url = self::API_URL . self::API_PATH . $function;
+    $url = $this->getApiUrl() . self::API_PATH . $function;
     if($method == "GET" && count($data['params']) >= 1) {
       $url .= "?" . $params;
       $path .= "?" . $params;
@@ -651,7 +680,7 @@ class BitMex {
 
     $function = $data['function'];
     $params = http_build_query($data['params']);
-    $url = self::API_URL . self::API_PATH . $function . "?" . $params;;
+    $url = $this->getApiUrl() . self::API_PATH . $function . "?" . $params;;
 
     $headers = array();
 
