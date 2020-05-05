@@ -211,6 +211,26 @@ class BitMex {
     return array_reverse($this->authQuery($data));
   }
 
+    /**
+     * Get Transaction History
+     *
+     * @param int $count
+     * @param int $start
+     * @return array
+     */
+    public function getWalletHistory(int $count = 100, int $start = 0): array
+    {
+        $data['method'] = "GET";
+        $data['function'] = "user/walletHistory";
+        $data['params'] = array(
+            "currency" => "XBt",
+            "count" => $count,
+            "start" => $start,
+        );
+
+        return array_reverse($this->authQuery($data));
+    }
+
   /*
    * Get Open Orders
    *
